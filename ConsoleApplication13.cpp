@@ -2,12 +2,13 @@
 #include <windows.h>
 #include <conio.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include "Header.h"
 
 
 using namespace std;
 #define random(a,b) a+rand()%(b+1-a)
-//#define DEBUG
+#define DEBUG
 
 enum ConsoleColor
 {
@@ -88,18 +89,47 @@ void showMenu() {
 
         keyCode = keyboardListener();
         switch (keyCode) {
+        case 72:
         case 119:
             if (counter > 0) counter--;
             break;
+        case 80:
         case 115:
             if (counter < 1) counter++;
+            break;
+        case 13:
+            if (counter == 1) 
+                exit(0);
+            if (counter == 0)
+                startGame();
+            
         }
-       // cout << counter;
+   
+    }
+   
+}
+
+void startGame() {
+    system("cls");
+    int keyCode = 0;
+    char** field = createField(9, 12);
+    while (true) {
+        keyCode = keyboardListener();
+        showArray(field);
+
+        switch (keyCode) {
+        case 27:
+            render();
+        }
     }
     
-
+    
+   
+    
 }
-void render(char** field) {
+
+void render() {
+    system("cls");
     showLogo();
     showMenu();
     //showArray(field);
@@ -153,10 +183,7 @@ int keyboardListener() {
 
 int main()
 {  
-
-
     srand(time(NULL));
-    windowSettings(30,20);
-    char** field = createField(9, 12);
-    render(field);
+    windowSettings(30,20);   
+    render();
 }

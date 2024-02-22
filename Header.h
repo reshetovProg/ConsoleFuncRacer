@@ -6,6 +6,7 @@ char** createField(int width, int height);
 void showArray(char** array);
 void showLogo();
 void showMenu();
-void render(char** field);
+void render();
 void windowSettings(int width, int height);
 int keyboardListener();
+void startGame();
