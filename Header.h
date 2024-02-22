@@ -10,3 +10,5 @@ void render();
 void windowSettings(int width, int height);
 int keyboardListener();
 void startGame();
+void clearField(char** array);
+void renderPlayer(char** field, int x);

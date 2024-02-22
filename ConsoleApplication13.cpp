@@ -5,10 +5,23 @@
 #include <stdlib.h>
 #include "Header.h"
 
+#include <thread>
+#include <chrono>
+
+
 
 using namespace std;
 #define random(a,b) a+rand()%(b+1-a)
-#define DEBUG
+//#define DEBUG
+
+void incrementer(bool& flag, int& value)
+{
+    while (flag == true)
+    {
+        this_thread::sleep_for(chrono::milliseconds(100));
+        ++value;
+    }
+}
 
 enum ConsoleColor
 {
@@ -54,7 +67,7 @@ void showArray(char** array) {
     int size = _msize(array) / sizeof(array[0]);
     int size2 = _msize(array[0]) / sizeof(array[0][0]);
     for (int i = 0; i < size; i++) {
-        moveCursor(10, 5+i);
+        moveCursor(3, 2+i);
         for (int j = 0; j < size2; j++) {
             cout << array[i][j]<<array[i][j];
         }
@@ -108,19 +121,109 @@ void showMenu() {
     }
    
 }
+void createEnemy(char** field, int x) {
+
+    int heightField = _msize(field) / sizeof(field[0]);
+    field[0][x] = '*';
+    field[0][x - 1] = '*';
+    field[0][x + 1] = '*';
+    field[1][x] = '*';
+    field[2][x] = '*';
+    field[2][x - 1] = '*';
+    field[2][x + 1] = '*';
+    field[3][x] = '*';
+
+
+}
+void clearField(char** array) {
+    int size = _msize(array) / sizeof(array[0]);
+    int size2 = _msize(array[0]) / sizeof(array[0][0]);
+    for (int i = 0; i < size; i++) {
+        for (int j = 0; j < size2; j++) {
+            if (array[i][j]!='*')
+                array[i][j]= char(176);
+        }
+    }
+}
+void renderPlayer(char** field, int x) {
+    int heightField = _msize(field) / sizeof(field[0]);
+    field[heightField - 1][x] = '.';
+    field[heightField - 1][x-1] = '.';
+    field[heightField - 1][x+1] = '.';
+    field[heightField - 2][x] = '.';
+    field[heightField - 3][x] = '.';
+    field[heightField - 3][x-1] = '.';
+    field[heightField - 3][x+1] = '.';
+    field[heightField - 4][x] = '.';
+
+}
+void moveEnemy(char** array) {
+    int size = _msize(array) / sizeof(array[0]);
+    int size2 = _msize(array[0]) / sizeof(array[0][0]);
+    for (int i = size - 1; i >= 0; i--) {
+        for (int j = 0; j < size2; j++) {
+            if (array[i][j] == '*') {
+                
+                if (i == size - 1) array[i][j] = char(176);
+                else {
+                    if (array[i + 1][j] == '.') render();
+                    swap(array[i][j], array[i + 1][j]);
+                }
+            }
+        }
+    }
+}
 
 void startGame() {
     system("cls");
     int keyCode = 0;
-    char** field = createField(9, 12);
+    char** field = createField(9, 16);
+    int position = 4;
+    int counter = 0;
+
+    bool flag{ true };
+    int value{ 0 };
+    thread th(incrementer, ref(flag), ref(value));
+
     while (true) {
         keyCode = keyboardListener();
+        clearField(field);
+        renderPlayer(field, position);
+        cout << value;
+        
+        
+        if (counter != value) {           
+            moveEnemy(field);
+            if (counter % 15 == 0) {
+                createEnemy(field, random(0, 2) * 3 + 1);
+            }
+            counter = value;
+           
+        }
+        
+        
         showArray(field);
 
         switch (keyCode) {
+        case 97:
+        case 75:
+            if (position > 1) {               
+                position--;
+            }                
+            break;
+        case 100:
+        case 77:
+            if (position < 7) {              
+                position++;
+            }                
+            break;
         case 27:
+            flag = false;
+            th.join();
             render();
         }
+
+       
     }
     
     
